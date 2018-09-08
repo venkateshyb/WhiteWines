@@ -1,0 +1,402 @@
+---
+title: "White_Wines1"
+author: "Venkatesh"
+date: "7/20/2018"
+output: html_document
+---
+
+getwd()
+setwd('~/desktop/tools/r/WhiteWines')
+```{r setup, include=TRUE}
+chooseCRANmirror(graphics=FALSE, ind=1)
+knitr::opts_chunk$set(echo = FALSE,message = FALSE,warning = FALSE)
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+# White_Wines
+# Loading Dataset
+```{r}
+ww<-read.csv('wineQualityWhites.csv')
+install.packages("ggplot2")
+library(ggplot2)
+```
+##Univariate Analysis:
+
+```{r}
+str(ww)
+
+```
+
+
+#### We can look into the structure of our wine dataset. Which will help us to prepare for visualization.
+
+```{r}
+table(ww$quality)
+
+```
+
+
+#### In this table we are trying to understand the range of quality variables. 
+```{r}
+summary(ww)
+```
+
+
+#### To look into the summary of mean median mode of the dataset to analyse and get use to it
+
+```{r}
+# Bar graph of quality to see the number of observations in each
+ggplot(aes(x=factor(quality)),data = subset(ww,!is.na(quality)))+geom_bar()
+
+```
+
+#### To understand the distribution of quality.we can see that we have very high values for quality 6 compared to others.
+
+
+```{r}
+
+
+# To understand the variance of Ph
+# Ph Freqpoly
+ggplot(aes(x=pH),data = subset(ww,!is.na(pH)))+geom_freqpoly()+scale_x_continuous(breaks=seq(3,3.5,0.1))
+
+```
+
+#### To understand the distribution of fixed acidity with respect to freq poly. we can see that mean values comes around 3.15 ph
+
+
+```{r}
+# I am going to take quality as my dependent variable 
+# Perform 1st visualization
+# Fixed_Acidity freqpoly 
+
+ggplot(aes(x=fixed.acidity),data = subset(ww,!is.na(fixed.acidity)))+geom_freqpoly()
+```
+
+#### we can see the mean of fixed acidity comes around 6 to 8. Most of the wine quality has this range.
+
+```{r}
+# To understand the changes present in the volatile acidity and citric acidity
+# volatile.acidity histogram
+ggplot(aes(x=volatile.acidity),data=subset(ww,!is.na(volatile.acidity)))+
+  geom_histogram()
+
+# citric acidity histogram
+ggplot(aes(x=citric.acid),data=subset(ww,!is.na(volatile.acidity)))+
+  geom_histogram()
+```
+
+#### To understand the distribution of citric acid and volatile acidity in the data. Citric acid has a mean value around 0.25 for its distribution and whereas volatile acidity has around 0.25 as mean in white wine.
+
+```{r}
+# To understand the interquartile ranges present in followinf variables
+# alcohol, residual sugar, density, sulphates, chlorides
+
+
+ggplot(aes(x=density),data=ww)+geom_histogram()+labs(title='distribution of density')
+
+
+```
+
+#### From this we can see that density has a mean value around 1. It has around 900 counts.
+
+```{r}
+ggplot(aes(x=sulphates),data=ww)+geom_histogram()+
+  labs(title='distribution of sulphates')
+```
+
+#### From this we can see that sulphates count increases and decreases around 0.4 to 0.6. we dont know yet whether it is a good factor or bad
+
+```{r}
+ggplot(aes(x=residual.sugar),data=ww)+geom_histogram()+labs(title='distribution of residual sugar')
+
+```
+
+
+#### In this graph we can see that there is very high sugar value concentration around 0 to 1. So most of the wine quality has this sugar value.
+```{r}
+ggplot(aes(x=chlorides),data=ww)+geom_histogram()+labs(title='distribution of chlorides')
+
+```
+
+
+#### Distribution of chlorides is normal based on the visualization. But there are many outliers present in it.
+
+```{r}
+ggplot(aes(x=alcohol),data=ww)+geom_histogram()+labs(title='distribution of alcohol')
+```
+
+#### Alcohol count decreases and increases on certian value. Further analysis are needed to view certain regions where it increases or decreases.
+
+
+```{r}
+# To understand the free sulphur dioxide and total sulphur dioxide present in wine quality
+install.packages('gridExtra')
+library(gridExtra)
+p1<-ggplot(aes(x=free.sulfur.dioxide ),data=subset(ww,!is.na(volatile.acidity)))+
+  geom_histogram()
+p2<-ggplot(aes(x=total.sulfur.dioxide ),data=subset(ww,!is.na(volatile.acidity)))+
+  geom_histogram()
+grid.arrange(p1,p2,ncol=2)
+```
+
+
+#### Inthis data we try to understand the difference between both free sulfur dioxide and total sulphur dioxide. we can see that free sulphur dioxide has more concentration than total sulphur dioxide.
+
+##Univariate Summary:
+
+####From this we have analyzed the certain topics in the dataset. Summary and structure of the data is shown in the graph which helps us identify the meaning of the data. Since we are taking quality as our subject we can see from the histogram of the quality that the mean is 6. From the frequency poly we can see that the acidity and ph levels are around 6 to 8 and 3 to 3.3. Citric acid has a mean value around .3. The box plots and histogram of the remaining variables will help to understand the range and data of the dataset.We have created the box plots to see the outliers present in the data.
+
+##Bivariate Plot Analysis
+```{r}
+#Relationship between fixed.acidity and quality using boxplots
+ggplot(aes(x=factor(quality),y=fixed.acidity),data = subset(ww,!is.na(quality)))+geom_boxplot(outlier.shape = NA)+
+scale_y_continuous(limits = quantile(ww$fixed.acidity, c(0.1, 0.9)))
+cor.test(ww$fixed.acidity,ww$quality)
+```
+
+
+#### In this box plot we can measure fixed acidity with respect to quality. From this we can see that quality rank 9 has higher fixed_acidity compared to others.
+
+```{r}
+# Relationship between quality and chlorides
+ggplot(aes(x=factor(quality),y=chlorides),data = subset(ww,!is.na(quality)))+geom_boxplot(outlier.shape = NA)+scale_y_continuous(limits = quantile(ww$chlorides, c(0.1, 0.9)))
+```
+
+
+#### In this graph we can see the quality factor based on chlorides.From this boxplots we can see that quality level 7,8,9 has lower chloride level compared to others.
+
+#Using GGpairs to find the relationships between all variables
+```{r echo=FALSE, warning=FALSE,fig.width=15,fig.height=9,pair_plots}
+library(GGally)
+wine_data <- subset(ww, select = -c(X))
+ggpairs(wine_data,
+         lower = list(continuous = wrap("points", shape = I('.'))),
+        upper = list(combo = wrap("box", outlier.shape = I('.')),
+                     continuous = wrap("cor", size = 1))) +
+  theme_grey(base_size = 5) +
+  theme(axis.text = element_text(size = 3),
+  legend.background = element_rect(fill = "white"),
+  panel.grid.major = element_line(colour = NA),
+  panel.grid.minor = element_blank()
+)
+```
+
+
+#### GGpairs graph is quite useful to find the relationship between variables and find relationships based on the correlation.
+
+```{r}
+ #rounded PH to round the ph values to 1 variable for analysis
+ww$round_pH<-round(ww$pH,digits = 1)
+
+```
+
+
+#### round pH is required to perform exploration which we cannot do with pH
+```{r}
+ggplot(aes(x=factor(quality),y=alcohol),data=ww)+geom_jitter(alpha=1/10)+
+  geom_boxplot(alpha=1/10,color='blue')+
+  stat_summary(fun.y='median',geom='point',color='red')+
+  labs(x='Quality ranking between 3 and 9',
+       y='Alcohol by volume',
+  title='BoxPlot across quality and alcohol')
+  
+```
+
+
+#### We can explore the data between Quality and Alcohol by using boxplots. In this plots we can see the high Quality median value increasing based on alcohol content.
+
+```{r}
+# Relationship between density and alcohol
+
+ggplot(aes(x=density,y=alcohol),data=ww)+geom_point(alpha=0.5)+coord_cartesian(
+  xlim=c(0.985,1.005),ylim=c(5,15))+geom_smooth(method='lm')+labs(title='Relationship between density and alcohol')
+```
+
+
+#### In this we can see the relationship between density and alcohol and how the concentration of alcohol decreases when increase in density. Increase in density also affects quality. Linear model is shown about the decrease in alcohol content.
+
+#Bivariate summary:
+
+####In the first when we plot between quality and acidity, quality and chlorides. we can see that acidity levels are low for good quality and poor quality. So acidity levels does not change the quality levels.Even the chloride levels indicate the same results, where high and low quality levels have same chloride content.From the ggpairs we can see the relationship between all the variables in that quality and alcohol correlate much better than others. We have rounded the ph value to its nearest decimal and transformed the data.  
+
+# MultiVariate Analysis
+
+####In this data we have taken x axis as quality and y axis as alcohol and colored with density to show the data based on rounded ph
+
+```{r}
+# Relationship between density ,alcohol and quality
+
+ggplot(aes(x=density,y=alcohol,color=factor(quality)),data=ww)+coord_cartesian(
+  xlim=c(0.985,1.005),ylim=c(5,15))+ geom_jitter()+scale_color_brewer(type='seq')+
+  theme_dark()+labs(x='Density',y='alcohol % by volume',title='Relationship between density and alcohol')
+```
+
+#### In this graph we can see the relationship between alcohol content and density. As density increases alcohol content decreases and from the quality we can see it reduces. Most of the dark blue dots are in the top.
+
+
+```{r}
+# Relationship between alcohol and quality with respect to density and PH
+ggplot(aes(x=quality,y=alcohol),data =subset(ww,!is.na(quality)))+
+  geom_point(alpha=.5,aes(color=density))+scale_fill_brewer(type='div')+
+  facet_wrap(~round_pH)+labs(title='Quality vs alcohol',y='alcohol % by volume')
+```
+
+
+####From this Scatterplot we can approxiamtely see that good quality wine will have a ph of 3 to 3.4 with less density and alcohol level about 10 - 14.
+
+
+```{r}
+# Scatterplot between residual sugar vs density and quality
+ggplot(aes(x=density,y=residual.sugar,color='red'),data =subset(ww,!is.na(density)))+
+  geom_point(alpha=.5)+scale_fill_brewer(type='div')+facet_wrap(~quality)+
+  coord_cartesian(xlim = c(0.985,1),ylim=c(0,20))+
+  geom_smooth(method = 'lm',color='blue')+
+  labs(title='Residual sugar vs density',x='Density mg/l')
+```
+
+
+
+####From this graph we can see that residual sugar in density with respect to quality.we can see that concentration of residual sugar is decreasing with respect to quality. But even low quality has very less residual sugar. So we cant come to any conclusion
+
+
+```{r}
+# scatterplot of Residual Sugar vs Density
+ggplot(aes(x=density,y=residual.sugar),data =subset(ww,!is.na(quality)))+
+  geom_jitter(alpha=.5,aes(color=pH))+scale_fill_brewer(type='div')+
+  coord_cartesian(xlim = c(0.985,1),ylim=c(0,20))+facet_wrap(~quality)+
+  labs(title='Residual Sugar vs Density',x='Density mg/l')
+
+```
+
+
+####From this we can see that even low quality and high quality has very high ph with respect to residual sugar.
+
+
+```{r}
+# Scatter Plot of Density vs Total Sulphur dioxide with respect to quality and ph
+ggplot(aes(x=density,y=total.sulfur.dioxide),data =subset(ww,!is.na(quality)))+
+  geom_point(alpha=.5,aes(color=pH))+scale_fill_brewer(type='div')+
+  coord_cartesian(xlim = c(0.985,1),ylim=c(0,300))+facet_wrap(~quality)+
+  labs(title='Density vs Total Sulfur dioxide',x='Density mg/l')
+```
+
+
+####From this we can see that most of the good Quality wine has very high ph of 3.75 with 100:0.99 concentration of total.sulfur.dioxide: density. This is important in analyzing quality in wine.
+
+
+```{r}
+# Alcohol vs density scatter plot with respect to quality
+ggplot(aes(x=density,y=alcohol),data =subset(ww,!is.na(quality)))+
+  geom_point(alpha=.3,aes(color=factor(quality)))+scale_fill_brewer(type='seq',guide = "colourbar",aesthetics = "fill",palette='Set1')+
+  coord_cartesian(xlim=c(0.985,1.0))+labs(title='Alcohol vs density',y='alcohol % by volume',x='Density mg/l')
+```
+
+
+#### This scatterplot will help us to understand the relationship between alcohol and density. We cannot really find a pattern here because most of the values seen are in the region 5 - 7. So this pattern is very difficult to analyze the relationship between alcohol and density with respect to quality.  
+
+```{r}
+# ScatterPlot of Cholride in Alcohol with respect to Ph value
+ggplot(aes(x=chlorides,y=alcohol),data =subset(ww,!is.na(quality)))+
+  geom_point(alpha=.5,aes(color=pH))+scale_fill_brewer(type='seq')+
+  coord_cartesian(xlim=c(0.0,.1))+labs(title='chlorides vs alcohol',y='alcohol % by volume')
+```
+
+
+#### In this scatterplot we can see percentahge of chloride content present in alcohol. This would be useful in measuring the role of cholride and ph in alcohol.
+
+```{r}
+# ScatterPlot of Citric acid in Alcohol
+ggplot(aes(x=alcohol,y=citric.acid),data =subset(ww,!is.na(quality)))+
+  geom_point()+scale_fill_brewer(type='div')+facet_wrap(~quality)+
+  ylim(0,quantile(ww$alcohol,0.95))+coord_cartesian(ylim=c(0,1.5),xlim=c(9,14))+
+  stat_summary(fun.y='mean',geom='line',color='red')+
+  labs(title='Concentration of citric acid in alcohol',x='alcohol % by volume')
+                                                                
+```
+
+
+####In this scatterplot, we can see that as quality increases, the concentration of citric acid in alcohol content increases towards 12 to 13.
+
+```{r}
+# Scatterplot of alcohol vs sulphates
+ggplot(aes(x=sulphates,y=alcohol),data =subset(ww,!is.na(quality)))+
+  geom_jitter(alpha=0.25)+scale_fill_brewer(type='div')+facet_wrap(~quality)+
+  labs(title='Alcohol vs Sulphates',y='alcohol % by volume')
+```
+
+
+####From this graph we can see the reaction between alcohol and sulphates with respect to quality. We can see that the quality increases the concentration of sulphates in alcohol increases towards 12 - 14.
+
+
+```{r}
+# Relationship between chlorides and alcohol
+ggplot(aes(x=chlorides,y=alcohol),data =subset(ww,!is.na(sulphates)))+
+  geom_point(aes(color=pH))+scale_fill_brewer(type='qual')+facet_wrap(~quality)+
+  geom_line(color='red',stat='summary',fun.y=mean)+coord_cartesian(xlim=c(0.0,.1))+
+  labs(title='alcohol vs chlorides',x='Chloride Content',y='alcohol % by volume')
+```
+
+
+####From various analysis done above we can say that good quality wine will have a ph of 3 to 3.4 with less density and good alcohol level. So alcohol content and quality correlate with each other. But when density increases in the wine it decreases the alcohol content and thus decreases the quality of wine.The sulphate content and chloride content decreases in concentration with respect to alcohol. These are some of the factors i observed in the explanatory data analysis process
+
+Final Plots and Summary:
+Plot 1:
+
+```{r}
+# Relationship between quality and alcohol based on density and rounded ph
+ggplot(aes(x=factor(quality),y=alcohol),data =subset(ww,!is.na(quality)))+
+  geom_point(alpha=.5,aes(color=density))+scale_fill_brewer(type='div')+
+  facet_wrap(~round_pH)+labs(title='Quality vs Alcohol',y='alcohol % by volume',
+                             x='Quality ranking between 3 and 9')
+```
+
+
+##Plot 1 Analysis
+####From this Scatterplot we can approxiamtely see that good quality wine will have a ph of 3 to 3.4 with less density and alcohol level about 10 - 14.
+
+
+Plot 2:
+```{r}
+ggplot(aes(x=factor(quality),y=alcohol),data=ww)+geom_jitter(alpha=1/10)+
+  geom_boxplot(alpha=1/10,color='blue')+
+  stat_summary(fun.y='median',geom='point',color='red')+
+  labs(x='Quality ranking between 3 and 9',
+       y='Alcohol by volume',
+  title='BoxPlot across quality and alcohol')
+```
+
+
+##Plot 2 Analysis
+#### From this box plots we can see clearly see the variation present in between quality and alcohol. From quality ranking 5 the alcohol content increases linearly with respect to quality. This is clear indication of positive relarionship between quality and alcohol.
+
+#### For Quality ranking 3 and 4 we can see from plot 1 that it might have got affected by density. The other factors the wine quality might have been affected by is due to the concentration of chlorides or sulphur dioxide as we have seen earlier.
+
+Plot 3:
+```{r}
+# Relationship between alcohol and chlorides based on ph, Quality
+ggplot(aes(x=chlorides,y=alcohol),data =subset(ww,!is.na(sulphates)))+
+  geom_point(aes(color=pH))+scale_fill_brewer(type='qual')+facet_wrap(~quality)+
+  geom_line(color='red',stat='summary',fun.y=mean)+labs(title='alcohol vs chlorides',x='chloride g/dm3',y='alcohol % by volume')
+```
+
+
+##Plot 3 Analysis
+####From Plot 2 we can see the effect of Quality and Alcohol, how it interrelates. From this scatterplot we can see that chlorides in alcohol plays a vital role in understanding quality. Chlorides content in alcohol should be in the ratio of 0.0 to 0.05 to 11 to 14 parts of alcohol. When the wine content does not satisfies this relationship, the quality of wine drops.In order to increase the quality, we have to make sure that it satisfies this criteria.
+
+
+
+# Reflection
+
+
+####For the given dataset it was difficult to find the relationships between variables. It was quite difficult to understand the chemical properties present in White wines. The most important issue was there wasn't much data avaialable for higher quality. Quality 8 and 9 are much less compared to others. Still i tried my best to understand the data and find exploratory realtionships between them. Since there is not any variable linearly corelated with others it is quite useless to perform linear regression.
+
+####Quality variable is used as dependent variable and others as independent. Based on this approach analysis is been made. We did some analysis based on acidity and ph levels, but none were successful in finding the results. Further approach gave some relationships between density and alcohol and alcohol and quality. These 2 variables gave some knowledge to classify the quality of the wine and anlalysis has been made on them. When density is less with good alcohol content and formidable Ph and chloride concentration will give us good Quality wine.
+
+####If there is enough dataset for higher qualities of wine in future, it will help us identify key features to analyze the chemical properties. The other factor missing is the price. Since price of wine could have helped us to broaden the search for quality and could give us further more relationships to predict the price.
+
+####Anyway from the data we can see that chlorides, alcohol content, density and Ph played crucial role understanding the quality. Since quality is my dependent variable i hope i did my best in describing the data. 
